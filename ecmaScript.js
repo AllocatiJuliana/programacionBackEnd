@@ -1,13 +1,24 @@
 class ProductManager {
+  id = 0;
   constructor() {
-    this.product = [];
+    this.products = [];
   }
 
   getProducts = () => {
-    return this.product;
+    return this.products;
   };
 
-  addProduct(title, description, price, thumbnail, code, stock) {
+  addProduct(product) {
+    const { title, description, price, thumbnail, code, stock } = product;
+
+    const findProductDuplicado = this.products.filter(
+      (prod) => prod.code === code
+    );
+    if (findProductDuplicado.length > 0) {
+      console.log("El codigo del producto ya existe ");
+      return;
+    }
+
     const newProduct = new Product(
       title,
       description,
@@ -16,18 +27,15 @@ class ProductManager {
       code,
       stock
     );
-    const findProductDuplicado = this.product.filter(
-      (prod) => prod.code === newProduct.code
-    );
-    if (findProductDuplicado.length > 0) {
-      console.log("El codigo del producto ya existe ");
-      return;
-    }
-    this.product.push(newProduct);
+
+    this.products.push({
+      id: this.id++,
+      ...newProduct,
+    });
   }
 
   getProductById(id) {
-    const getProduct = this.product.find((prod) => prod.id === id);
+    const getProduct = this.products.find((prod) => prod.id === id);
     if (getProduct) {
       return getProduct;
     }
@@ -36,9 +44,9 @@ class ProductManager {
 }
 
 class Product {
-  static id = 1;
+  //static id = 1;
   constructor(title, description, price, thumbnail, code, stock) {
-    this.id = Product.id++;
+    //this.id = Product.id++;
     this.title = title;
     this.description = description;
     this.price = price;
@@ -47,33 +55,36 @@ class Product {
     this.stock = stock;
   }
 }
-const product = new ProductManager();
-product.addProduct(
-  "Bowl",
-  "Bowl con Hojas Azules",
-  4620,
-  "https://res.cloudinary.com/dlsk3cazy/image/upload/v1680901836/1_iu21qp.jpg",
-  "b01",
-  5
-);
-product.addProduct(
-  "Cuchara",
-  "Cuchara Dorada con Punta en Forma de Hojas",
-  2200,
-  "https://res.cloudinary.com/dlsk3cazy/image/upload/v1680901837/2_uz8jnn.jpg",
-  "b02",
-  8
-);
-product.addProduct(
-  "Frasco",
-  "Frasco con Flores Naranjas",
-  8690,
-  "https://res.cloudinary.com/dlsk3cazy/image/upload/v1680901836/3_sa54a9.jpg",
-  "b02",
-  3
-);
+const productManager = new ProductManager();
+productManager.addProduct({
+  title: "Bowl",
+  description: "Bowl con Hojas Azules",
+  price: 4620,
+  thumbnail:
+    "https://res.cloudinary.com/dlsk3cazy/image/upload/v1680901836/1_iu21qp.jpg",
+  code: "b01",
+  stock: 5,
+});
+productManager.addProduct({
+  title: "Cuchara",
+  description: "Cuchara Dorada con Punta en Forma de Hojas",
+  price: 2200,
+  thumbnail:
+    "https://res.cloudinary.com/dlsk3cazy/image/upload/v1680901837/2_uz8jnn.jpg",
+  code: "b02",
+  stock: 8,
+});
+productManager.addProduct({
+  title: "Frasco",
+  description: "Frasco con Flores Naranjas",
+  price: 8690,
+  thumbnail:
+    "https://res.cloudinary.com/dlsk3cazy/image/upload/v1680901836/3_sa54a9.jpg",
+  code: "b02",
+  stock: 3,
+});
 
 console.log("Todos los Productos");
-console.log(product.getProducts());
+console.log(productManager.getProducts());
 console.log("Buscando Producto 100");
-product.getProductById(100);
+productManager.getProductById(100);
