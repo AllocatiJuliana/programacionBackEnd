@@ -1,4 +1,3 @@
-import { log } from "console";
 import fs from "fs/promises";
 
 export default class ProductManager {
@@ -6,14 +5,11 @@ export default class ProductManager {
   constructor() {
     this.products = [];
     this.path = "./products.json";
-    this.readFile();
   }
 
   async readFile() {
     try {
       const json = await fs.readFile(this.path, "utf-8");
-      // this.products = JSON.parse(json);
-      // this.id = this.products[this.products.length - 1].id + 1;
       return json;
     } catch {
       console.log(`El archivo ${this.path} no existe, creando...`);
@@ -29,6 +25,9 @@ export default class ProductManager {
   };
 
   async addProduct(product) {
+    const json = await this.readFile();
+    this.products = JSON.parse(json);
+
     const { title, description, price, thumbnail, code, stock } = product;
 
     const itsValid = this.products.some(
@@ -39,17 +38,17 @@ export default class ProductManager {
       return;
     }
 
-    const newProduct = new Product(product);
-    const json = await this.readFile();
-    this.products = JSON.parse(json);
-    console.log(json);
+    const productn = new Product(product);
+
     this.products.push({
-      id: this.id++,
-      ...newProduct,
+      id: this.products.length + 1,
+      ...productn,
     });
-    const newProducto = JSON.stringify(this.products);
-    await fs.writeFile(this.path, JSON.stringify(this.products, null, 2));
-    return newProducto;
+
+    const newProduct = JSON.stringify(this.products);
+    await fs.writeFile(this.path, newProduct);
+
+    return `producto ${title} ingresado correctamente`;
   }
 
   async getProductById(id) {
@@ -113,23 +112,32 @@ const productManager = new ProductManager();
 //1. Esto es para agregar productos.
 //2. Genera el id sin repetirse.
 
-productManager.addProduct({
-  title: "cuchara",
-  description: "cuchara dorado",
-  price: "6200",
-  thumbnail: "url",
-  code: "n04",
-  stock: "15",
-});
+// await productManager.addProduct({
+//   title: "cuchara",
+//   description: "cuchara dorado",
+//   price: "6200",
+//   thumbnail: "url",
+//   code: "n04",
+//   stock: "15",
+// });
 
-productManager.addProduct({
-  title: "tenedor",
-  description: "tenedo   dorado",
-  price: "620",
-  thumbnail: "url",
-  code: "n05",
-  stock: "17",
-});
+// await productManager.addProduct({
+//   title: "tenedor",
+//   description: "tenedo   dorado",
+//   price: "620",
+//   thumbnail: "url",
+//   code: "n05",
+//   stock: "17",
+// });
+
+// await productManager.addProduct({
+//   title: "cuchillo",
+//   description: "cuchillo dorado",
+//   price: "62000",
+//   thumbnail: "url",
+//   code: "n08",
+//   stock: "25",
+// });
 
 //03. Ver todos los productos agregados
 // console.log(await productManager.getProducts());
