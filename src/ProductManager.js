@@ -5,29 +5,30 @@ export default class ProductManager {
   constructor() {
     this.products = [];
     this.path = "./products.json";
+    this.loadData();
   }
 
-  async readFile() {
+  async loadData() {
     try {
       const json = await fs.readFile(this.path, "utf-8");
-      return json;
+      this.products = JSON.parse(json);
+      if (this.products.length < 0) {
+        this.id = 0;
+      } else {
+        this.id = this.products[this.products.length - 1].id + 1;
+      }
     } catch {
-      console.log(`El archivo ${this.path} no existe, creando...`);
+      console.log(`el archivo ${this.path}no existe, creando...`);
       await fs.writeFile(this.path, "[]");
       return [];
     }
   }
 
   getProducts = async () => {
-    const json = await this.readFile();
-    this.products = JSON.parse(json);
     return this.products;
   };
 
   async addProduct(product) {
-    const json = await this.readFile();
-    this.products = JSON.parse(json);
-
     const { title, description, price, thumbnail, code, stock } = product;
 
     const itsValid = this.products.some(
@@ -41,7 +42,7 @@ export default class ProductManager {
     const productn = new Product(product);
 
     this.products.push({
-      id: this.products.length + 1,
+      id: this.id++,
       ...productn,
     });
 
@@ -52,38 +53,31 @@ export default class ProductManager {
   }
 
   async getProductById(id) {
-    const json = await this.readFile();
-    this.products = JSON.parse(json);
     const getProduct = this.products.find((prod) => prod.id === id);
     if (getProduct) {
       return getProduct;
     }
     return "Producto Not found";
   }
-  async updateProduct(product) {
-    const { id, title, description, price, thumbnail, code, stock } = product;
-    const json = await this.readFile();
-    this.products = JSON.parse(json);
+  async updateProduct(id, product) {
+    const { title, description, price, thumbnail, code, stock } = product;
 
-    const index = this.products.findIndex((producto) => producto.id === id);
+    const itsValid = this.products.some((productFind) => productFind.id === id);
+    if (itsValid) {
+      console.log(`ERROR: ID in use in ${product.title}`);
+      return;
+    }
 
-    const productUpdate = {
-      id: this.products[index].id,
-      title,
-      description,
-      price,
-      thumbnail,
-      code,
-      stock,
-    };
-    this.products[index] = productUpdate;
-    const newProducto = JSON.stringify(this.products);
-    await fs.writeFile(this.path, newProducto);
+    let update = this.products.map((p) => {
+      if (p.id === id) {
+        return { ...p, ...product };
+      }
+      return p;
+    });
+    await fs.writeFile(this.path, JSON.stringify(update));
   }
-  async deleteProduct(id) {
-    const json = await this.readFile();
-    this.products = JSON.parse(json);
 
+  async deleteProduct(id) {
     const index = this.products.findIndex((producto) => producto.id === id);
     if (index < 0) {
       return "Producto Not found";
@@ -146,15 +140,14 @@ const productManager = new ProductManager();
 // console.log(await productManager.getProductById(4));
 
 //05. Cambiar producto
-// productManager.updateProduct(
-//   1,
-//   "cuchillo",
-//   "cuchillo dorado",
-//   "3000",
-//   "url",
-//   "n06",
-//   "20"
-// );
+productManager.updateProduct(1, {
+  title: "taza",
+  description: "taza dorado",
+  price: "5980",
+  thumbnail: "url",
+  code: "n12",
+  stock: "250",
+});
 
 //06. Eliminar Producto
 // console.log(await productManager.deleteProduct(0));
