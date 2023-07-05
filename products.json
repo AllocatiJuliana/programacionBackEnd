@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "tenedor",
+    "description": "tenedo   dorado",
+    "price": "620",
+    "thumbnail": "url",
+    "code": "n05",
+    "stock": "17"
+  }
+]

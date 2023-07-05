@@ -1,16 +1,25 @@
 import { log } from "console";
 import fs from "fs/promises";
 
-class ProductManager {
+export default class ProductManager {
   id = 0;
   constructor() {
     this.products = [];
     this.path = "./products.json";
+    this.readFile();
   }
 
   async readFile() {
-    const json = await fs.readFile(this.path, "utf8");
-    return json;
+    try {
+      const json = await fs.readFile(this.path, "utf-8");
+      // this.products = JSON.parse(json);
+      // this.id = this.products[this.products.length - 1].id + 1;
+      return json;
+    } catch {
+      console.log(`El archivo ${this.path} no existe, creando...`);
+      await fs.writeFile(this.path, "[]");
+      return [];
+    }
   }
 
   getProducts = async () => {
@@ -19,22 +28,28 @@ class ProductManager {
     return this.products;
   };
 
-  async addProduct(title, description, price, thumbnail, code, stock) {
-    const newProduct = new Product(
-      title,
-      description,
-      price,
-      thumbnail,
-      code,
-      stock
-    );
+  async addProduct(product) {
+    const { title, description, price, thumbnail, code, stock } = product;
 
+    const itsValid = this.products.some(
+      (productFind) => productFind.code === code
+    );
+    if (itsValid) {
+      console.log(`ERROR: Code in use in ${product.title}`);
+      return;
+    }
+
+    const newProduct = new Product(product);
+    const json = await this.readFile();
+    this.products = JSON.parse(json);
+    console.log(json);
     this.products.push({
       id: this.id++,
       ...newProduct,
     });
     const newProducto = JSON.stringify(this.products);
-    await fs.writeFile(this.path, newProducto);
+    await fs.writeFile(this.path, JSON.stringify(this.products, null, 2));
+    return newProducto;
   }
 
   async getProductById(id) {
@@ -46,7 +61,8 @@ class ProductManager {
     }
     return "Producto Not found";
   }
-  async updateProduct(id, title, description, price, thumbnail, code, stock) {
+  async updateProduct(product) {
+    const { id, title, description, price, thumbnail, code, stock } = product;
     const json = await this.readFile();
     this.products = JSON.parse(json);
 
@@ -82,7 +98,8 @@ class ProductManager {
 }
 
 class Product {
-  constructor(title, description, price, thumbnail, code, stock) {
+  constructor(product) {
+    const { title, description, price, thumbnail, code, stock } = product;
     this.title = title;
     this.description = description;
     this.price = price;
@@ -96,23 +113,23 @@ const productManager = new ProductManager();
 //1. Esto es para agregar productos.
 //2. Genera el id sin repetirse.
 
-// productManager.addProduct(
-//   "cuchara",
-//   "cuchara dorado",
-//   "6200",
-//   "url",
-//   "n04",
-//   "15"
-// );
+productManager.addProduct({
+  title: "cuchara",
+  description: "cuchara dorado",
+  price: "6200",
+  thumbnail: "url",
+  code: "n04",
+  stock: "15",
+});
 
-// productManager.addProduct(
-//   "tenedor",
-//   "tenedo   dorado",
-//   "620",
-//   "url",
-//   "n05",
-//   "17"
-// );
+productManager.addProduct({
+  title: "tenedor",
+  description: "tenedo   dorado",
+  price: "620",
+  thumbnail: "url",
+  code: "n05",
+  stock: "17",
+});
 
 //03. Ver todos los productos agregados
 // console.log(await productManager.getProducts());
