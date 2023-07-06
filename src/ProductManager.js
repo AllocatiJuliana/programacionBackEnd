@@ -4,7 +4,7 @@ export default class ProductManager {
   id = 0;
   constructor() {
     this.products = [];
-    this.path = "./products.json";
+    this.path = "./src/products.json";
     this.loadData();
   }
 
@@ -12,23 +12,27 @@ export default class ProductManager {
     try {
       const json = await fs.readFile(this.path, "utf-8");
       this.products = JSON.parse(json);
-      if (this.products.length < 0) {
-        this.id = 0;
+      if (this.products.length < 1) {
+        this.id = 1;
       } else {
         this.id = this.products[this.products.length - 1].id + 1;
       }
     } catch {
-      console.log(`el archivo ${this.path}no existe, creando...`);
+      console.log(`el archivo ${this.path} no existe, creando...`);
       await fs.writeFile(this.path, "[]");
       return [];
     }
   }
 
   getProducts = async () => {
+    const json = await fs.readFile(this.path, "utf-8");
+    this.products = JSON.parse(json);
     return this.products;
   };
 
   async addProduct(product) {
+    const json = await fs.readFile(this.path, "utf-8");
+    this.products = JSON.parse(json);
     const { title, description, price, thumbnail, code, stock } = product;
 
     const itsValid = this.products.some(
@@ -46,13 +50,15 @@ export default class ProductManager {
       ...productn,
     });
 
-    const newProduct = JSON.stringify(this.products);
+    const newProduct = JSON.stringify(this.products, null, 2);
     await fs.writeFile(this.path, newProduct);
 
     return `producto ${title} ingresado correctamente`;
   }
 
   async getProductById(id) {
+    const json = await fs.readFile(this.path, "utf-8");
+    this.products = JSON.parse(json);
     const getProduct = this.products.find((prod) => prod.id === id);
     if (getProduct) {
       return getProduct;
@@ -60,10 +66,12 @@ export default class ProductManager {
     return "Producto Not found";
   }
   async updateProduct(id, product) {
+    const json = await fs.readFile(this.path, "utf-8");
+    this.products = JSON.parse(json);
     const { title, description, price, thumbnail, code, stock } = product;
 
     const itsValid = this.products.some((productFind) => productFind.id === id);
-    if (itsValid) {
+    if (!itsValid) {
       console.log(`ERROR: ID in use in ${product.title}`);
       return;
     }
@@ -74,10 +82,12 @@ export default class ProductManager {
       }
       return p;
     });
-    await fs.writeFile(this.path, JSON.stringify(update));
+    await fs.writeFile(this.path, JSON.stringify(update, null, 2));
   }
 
   async deleteProduct(id) {
+    const json = await fs.readFile(this.path, "utf-8");
+    this.products = JSON.parse(json);
     const index = this.products.findIndex((producto) => producto.id === id);
     if (index < 0) {
       return "Producto Not found";
@@ -140,14 +150,14 @@ const productManager = new ProductManager();
 // console.log(await productManager.getProductById(4));
 
 //05. Cambiar producto
-productManager.updateProduct(1, {
-  title: "taza",
-  description: "taza dorado",
-  price: "5980",
-  thumbnail: "url",
-  code: "n12",
-  stock: "250",
-});
+// productManager.updateProduct(1, {
+//   title: "taza",
+//   description: "taza dorad12312321o",
+//   price: "5980",
+//   thumbnail: "url",
+//   code: "n12",
+//   stock: "250",
+// });
 
 //06. Eliminar Producto
 // console.log(await productManager.deleteProduct(0));

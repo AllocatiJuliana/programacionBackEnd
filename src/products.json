@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": 0,
+    "title": "cuchara",
+    "description": "cuchara dorado",
+    "price": "6200",
+    "thumbnail": "url",
+    "code": "n04",
+    "stock": "15"
+  },
+  {
+    "id": 1,
+    "title": "taza",
+    "description": "taza dorad12312321o",
+    "price": "5980",
+    "thumbnail": "url",
+    "code": "n12",
+    "stock": "250"
+  },
+  {
+    "id": 2,
+    "title": "cuchillo",
+    "description": "cuchillo dorado",
+    "price": "62000",
+    "thumbnail": "url",
+    "code": "n08",
+    "stock": "25"
+  }
+]
