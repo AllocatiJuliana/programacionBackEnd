@@ -14,7 +14,7 @@ app.get("/productos", async (req, res) => {
   }
 });
 
-app.get("/producto/:id", async (req, res) => {
+app.get("/productos/:id", async (req, res) => {
   const { id } = req.params;
   const productos = await manager.getProductById(+id);
   res.send(productos);
